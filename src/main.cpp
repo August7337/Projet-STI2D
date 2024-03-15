@@ -1,14 +1,13 @@
 #include <Arduino.h>
 #include "hasher.h"
+#include "potentiometer.h"
 
 const int hasherPin = 9;
 
 int pinA = 3; // Connected to CLK on KY-040
- int pinB = 4; // Connected to DT on KY-040
- int encoderPosCount = 0;
- int pinALast;
- int aVal;
- boolean bCW;
+int pinB = 4; // Connected to DT on KY-040
+int pinALast;
+
 
 void setup() {
   Serial.begin(9600);
@@ -23,36 +22,5 @@ void setup() {
 }
 
 void loop() {
-  function(hasherPin, encoderPosCount);
-
-  aVal = digitalRead(pinA);
- if (aVal != pinALast){ // Means the knob is rotating
- // if the knob is rotating, we need to determine direction
- // We do that by reading pin B.
- if (digitalRead(pinB) != aVal) { // Means pin A Changed first - We're Rotating Clockwise
- if (encoderPosCount < 100)
- {
-  encoderPosCount ++;
- }
- 
- bCW = true;
- } else {// Otherwise B changed first and we're moving CCW
- bCW = false;
- if (encoderPosCount > 0)
- {
-   encoderPosCount--;
- }
-
- }
- Serial.print ("Rotated: ");
- if (bCW){
- Serial.println ("clockwise");
- }else{
- Serial.println("counterclockwise");
- }
- Serial.print("Encoder Position: ");
- Serial.println(encoderPosCount);
-
- }
- pinALast = aVal;
-}
+    Hasher(hasherPin, Potentiometer(pinA, pinB, pinALast, 0, 100));
+}   

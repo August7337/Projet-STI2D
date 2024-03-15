@@ -4,7 +4,7 @@
 unsigned long previousMillis = 0;
 bool isHigh;
 
-void function(int pin, int pourcentage) {
+void Hasher(int pin, int pourcentage) {
   int timeHigh = pourcentage;
   int timeLow = 100 - pourcentage;
   
