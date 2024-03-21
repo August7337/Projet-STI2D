@@ -12,7 +12,7 @@ int Potentiometer(int pinA, int pinB, int pinALast, int minValue, int maxValue) 
         // if the knob is rotating, we need to determine direction
         // We do that by reading pin B.
         if (digitalRead(pinB) != aVal) { // Means pin A Changed first - We're Rotating Clockwise
-            if (encoderPosCount <= 100)
+            if (encoderPosCount <= maxValue)
             {
                 encoderPosCount ++;
             }
@@ -20,7 +20,7 @@ int Potentiometer(int pinA, int pinB, int pinALast, int minValue, int maxValue) 
 
         } else {// Otherwise B changed first and we're moving CCW
             bCW = false;
-            if (encoderPosCount >= 0)
+            if (encoderPosCount >= minValue)
             {
                 encoderPosCount--;
             }

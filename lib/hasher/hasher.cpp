@@ -18,5 +18,4 @@ void Hasher(int pin, int pourcentage) {
     isHigh = true;
     digitalWrite(pin, LOW);
   }
-
 }
