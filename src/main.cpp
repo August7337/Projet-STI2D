@@ -5,11 +5,11 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
-
 const int hasherPin = 9;
 
 int pinA = 3; // Connected to CLK on KY-040
 int pinB = 4; // Connected to DT on KY-040
+int pinC = 5;
 int pinALast;
 
 #define LCD_ADDR 0x27 
@@ -27,6 +27,7 @@ void setup() {
 
     pinMode (pinA,INPUT);
     pinMode (pinB,INPUT);
+    pinMode (pinC,INPUT);
     pinALast = digitalRead(pinA); 
 
     lcd.init();   
@@ -34,12 +35,46 @@ void setup() {
     lcd.setCursor(0,0);
 }
 
-void loop() {
-    
-    int pot = Potentiometer(pinA, pinB, pinALast, 0, 100);
+int lastPot=0;
+int pot;
+
+int menuPos = 1;
+
+void fanMenu();
+void fanMenu(){
+    pot = Potentiometer(pinA, pinB, pinALast, 0, 100);
     Hasher(hasherPin, pot);
 
-    // Screen
-    lcd.print(String(pot));
-    lcd.clear();   
-}   
+    if (lastPot == pot)
+    {
+        lcd.setCursor(0,0);
+        lcd.print("Ventilateur 1");
+        lcd.setCursor(0,1);
+        lcd.print(String(pot));
+        lcd.print(" %");
+        lcd.clear();
+    }
+    lastPot = pot;
+}
+
+void loop() {
+
+    if (menuPos == 1)
+    {
+        lcd.setCursor(0,0);
+        lcd.print("Menu principal");
+
+        lcd.clear();
+        pot = Potentiometer(pinA, pinB, pinALast, 0, 100);
+        Serial.println(digitalRead(pinC));
+        //Serial.println(pot);
+        if (digitalRead(pinC) == 0)
+        {
+            menuPos = 11;
+        }
+        Hasher(hasherPin, pot);
+    }
+    else if (menuPos == 11){
+        fanMenu();
+    }
+}
