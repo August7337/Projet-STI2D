@@ -26,14 +26,14 @@ int Potentiometer(int pinA, int pinB, int pinALast, int minValue, int maxValue) 
             }
         }
 
-        Serial.print ("Rotated: ");
-        if (bCW){
-            Serial.println ("clockwise");
-        }else{
-            Serial.println("counterclockwise");
-        }
-        Serial.print("Encoder Position: ");
-        Serial.println(encoderPosCount);
+        //Serial.print ("Rotated: ");
+        //if (bCW){
+        //    Serial.println ("clockwise");
+        //}else{
+        //    Serial.println("counterclockwise");
+        //}
+        //Serial.print("Encoder Position: ");
+        //Serial.println(encoderPosCount);
 
     }
     pinALast = aVal;
