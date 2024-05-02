@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "hasher.h"
 #include "RotaryEncoder.h"
-
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+
 
 const int hasherPin = 9;//10;
 
@@ -16,18 +16,20 @@ const int hasherPin = 9;//10;
 // Création d'une instance de l'écran LCD
 LiquidCrystal_I2C lcd(LCD_ADDR, LCD_COLS, LCD_ROWS);  
 
-int settingsCounter = 0, lastSettingsCount = 0;
-int fan1Counter = 0, lastFan1Count = 0;
-void RotaryChanged(); //we need to declare the func above so Rotary goes to the one below
-
-RotaryEncoder Rotary(&RotaryChanged, 2, 3, 4); // Pins 2 (DT), 3 (CLK), 4 (SW)
-
 int lastPot=0;
 int pot;
 int potMenu;
 int menuPos = 1;
 
 bool needRefresh = false;
+
+int settingsCounter = 0, lastSettingsCount = 0;
+int fan1Count = 0, lastFan1Count = 0;
+int lastTempCount = 0, tempCount = 0;
+int lastMotorCount = 0, motorCount = 0;
+
+void RotaryChanged();
+RotaryEncoder Rotary(&RotaryChanged, 2, 3, 4); // Pins 2 (DT), 3 (CLK), 4 (SW)
 
 void RotaryChanged()
 {
@@ -38,9 +40,17 @@ void RotaryChanged()
     {
         settingsCounter--;
     }
+    else if (menuPos == 111)
+    {
+        tempCount--;
+    }
     else if (menuPos == 1131)
     {
-        fan1Counter--;
+        fan1Count--;
+    }
+    else if (menuPos == 112)
+    {
+        motorCount--;
     }
   }
     
@@ -50,12 +60,19 @@ void RotaryChanged()
     {
         settingsCounter++;
     }
+    else if (menuPos == 111)
+    {
+        tempCount++;
+    }
     else if (menuPos == 1131)
     {
-        fan1Counter++;
+        fan1Count++;
+    }
+    else if (menuPos == 112)
+    {
+        motorCount++;
     }
   }
-      
 }
 
 void setup() {
@@ -135,6 +152,12 @@ void settingsMenu(){
         {
             needRefresh = true;
             menuPos = 1;
+        } else if (settingsCounter == 1) {
+            needRefresh = true;
+            menuPos = 111;
+        } else if (settingsCounter == 2) {
+            needRefresh = true;
+            menuPos = 112;
         } else if (settingsCounter == 3) {
             needRefresh = true;
             menuPos = 1131;
@@ -145,20 +168,58 @@ void settingsMenu(){
 
 void fanMenu();
 void fanMenu(){
-    Hasher(hasherPin, fan1Counter);
+    Hasher(hasherPin, fan1Count);
 
-    if (lastFan1Count != fan1Counter || needRefresh)  
+    if (lastFan1Count != fan1Count || needRefresh)  
     {
         needRefresh = false;
 
         lcd.clear();
         lcd.setCursor(0,0);
-        lcd.print("Ventilateur 1");
+        lcd.print("Ventilateur 1 ");
         lcd.setCursor(0,1);
-        lcd.print(String(fan1Counter));
+        lcd.print(String(fan1Count));
         lcd.print(" %");  
 
-        lastFan1Count = fan1Counter;
+        lastFan1Count = fan1Count;
+    }
+}
+
+void tempMenu();
+void tempMenu(){
+    Hasher(hasherPin, fan1Count);
+
+    if (lastTempCount != tempCount || needRefresh)  
+    {
+        needRefresh = false;
+
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Temperature ");
+        lcd.setCursor(0,1);
+        lcd.print(String(tempCount));
+        lcd.print(" %");  
+
+        lastTempCount = tempCount;
+    }
+}
+
+void motorMenu();
+void motorMenu(){
+    Hasher(hasherPin, fan1Count);
+
+    if (lastMotorCount != motorCount || needRefresh)  
+    {
+        needRefresh = false;
+
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Moteur ");
+        lcd.setCursor(0,1);
+        lcd.print(String(motorCount));
+        lcd.print(" %");  
+
+        lastMotorCount = motorCount;
     }
 }
 
@@ -170,6 +231,12 @@ void loop() {
     }
     else if (menuPos == 11){
         settingsMenu();
+    }
+    else if (menuPos == 111){
+        tempMenu();
+    }
+    else if (menuPos == 112){
+        motorMenu();
     }
     else if (menuPos == 1131){
         fanMenu();
