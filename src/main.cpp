@@ -5,7 +5,9 @@
 #include <LiquidCrystal_I2C.h>
 
 
-const int hasherPin = 9;//10;
+const int fan1HasherPin = 9;
+const int tempHasherPin = 10;
+const int motorHasherPin = 11;
 
 #define LCD_ADDR 0x27 
 
@@ -40,15 +42,15 @@ void RotaryChanged()
     {
         settingsCounter--;
     }
-    else if (menuPos == 111)
+     if (menuPos == 111)
     {
         tempCount--;
     }
-    else if (menuPos == 1131)
+     if (menuPos == 1131)
     {
         fan1Count--;
     }
-    else if (menuPos == 112)
+     if (menuPos == 112)
     {
         motorCount--;
     }
@@ -60,29 +62,19 @@ void RotaryChanged()
     {
         settingsCounter++;
     }
-    else if (menuPos == 111)
+     if (menuPos == 111)
     {
         tempCount++;
     }
-    else if (menuPos == 1131)
+     if (menuPos == 1131)
     {
         fan1Count++;
     }
-    else if (menuPos == 112)
+     if (menuPos == 112)
     {
         motorCount++;
     }
   }
-}
-
-void setup() {
-    Rotary.setup();  
-    Serial.begin(9600);
-    pinMode(hasherPin, OUTPUT);
-
-    lcd.init();   
-    lcd.backlight();
-    lcd.setCursor(0,0);
 }
 
 void mainMenu();
@@ -98,11 +90,27 @@ void mainMenu(){
     }
 }
 
+void setup() {
+    Rotary.setup();  
+    Serial.begin(9600);
+    pinMode(fan1HasherPin, OUTPUT);
+    digitalWrite(fan1HasherPin, LOW);
 
+    pinMode(tempHasherPin, OUTPUT);
+    digitalWrite(tempHasherPin, LOW);
+
+    pinMode(motorHasherPin, OUTPUT);
+    digitalWrite(motorHasherPin, LOW);
+    
+    lcd.init();   
+    lcd.backlight();
+    lcd.setCursor(0,0);
+
+    mainMenu();
+}
 
 void settingsMenu();
 void settingsMenu(){
-    Hasher(hasherPin, settingsCounter);
 
     if (lastSettingsCount != settingsCounter || needRefresh )  
     {
@@ -168,7 +176,6 @@ void settingsMenu(){
 
 void fanMenu();
 void fanMenu(){
-    Hasher(hasherPin, fan1Count);
 
     if (lastFan1Count != fan1Count || needRefresh)  
     {
@@ -183,11 +190,17 @@ void fanMenu(){
 
         lastFan1Count = fan1Count;
     }
+
+    if (Rotary.GetButtonDown())
+    {
+        needRefresh = true;
+        menuPos = 11;
+        
+    }
 }
 
 void tempMenu();
 void tempMenu(){
-    Hasher(hasherPin, fan1Count);
 
     if (lastTempCount != tempCount || needRefresh)  
     {
@@ -202,11 +215,17 @@ void tempMenu(){
 
         lastTempCount = tempCount;
     }
+
+    if (Rotary.GetButtonDown())
+    {
+        needRefresh = true;
+        menuPos = 11;
+        
+    }
 }
 
 void motorMenu();
 void motorMenu(){
-    Hasher(hasherPin, fan1Count);
 
     if (lastMotorCount != motorCount || needRefresh)  
     {
@@ -221,6 +240,14 @@ void motorMenu(){
 
         lastMotorCount = motorCount;
     }
+
+    if (Rotary.GetButtonDown())
+    {
+        needRefresh = true;
+        menuPos = 11;
+        
+    }
+    Hasher(motorHasherPin, motorCount);
 }
 
 
@@ -241,4 +268,10 @@ void loop() {
     else if (menuPos == 1131){
         fanMenu();
     }
+
+    // Hasher section
+    Hasher(fan1HasherPin, fan1Count);
+    Hasher(tempHasherPin, tempCount);
+    
+
 }
