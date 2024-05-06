@@ -247,7 +247,6 @@ void motorMenu(){
         menuPos = 11;
         
     }
-    Hasher(motorHasherPin, motorCount);
 }
 
 
@@ -272,6 +271,6 @@ void loop() {
     // Hasher section
     Hasher(fan1HasherPin, fan1Count);
     Hasher(tempHasherPin, tempCount);
-    
-
+    Hasher(motorHasherPin, motorCount);
+    Serial.println(motorCount);
 }
