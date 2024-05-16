@@ -11,6 +11,8 @@ const int fan1HasherPin = 9;
 const int tempHasherPin = 10;
 const int motorHasherPin = 11;
 
+#define sensor A1
+
 #define LCD_ADDR 0x27 
 
 // Nombre de colonnes et de lignes de l'écran LCD
@@ -80,9 +82,13 @@ void RotaryChanged()
 // Interface et logique du menu principal
 void mainMenu();
 void mainMenu(){
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Menu principal");
+    if (needRefresh)
+    {
+        needRefresh = false;
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Menu principal");
+    }
     
     if (Rotary.GetButtonDown())
     {
@@ -252,12 +258,11 @@ void loop() {
     else if (menuPos == 1131){
         fanMenu();
     }
-
+    Serial.println(analogRead(sensor));
     // Section du controle des éléments 12v
     //Hasher(fan1HasherPin, fan1Target);
     //Hasher(tempHasherPin, tempTarget);
     //Hasher(motorHasherPin, motorTarget);
-    //Hasher(fan1HasherPin, fan1Count);
 }
 
 // Fonction exécuté
@@ -272,10 +277,13 @@ void setup() {
 
     pinMode(motorHasherPin, OUTPUT);
     digitalWrite(motorHasherPin, LOW);
+
+    pinMode(sensor, INPUT);
     
     lcd.init();   
     lcd.backlight();
     lcd.setCursor(0,0);
 
+    needRefresh = true;
     mainMenu();
 }
